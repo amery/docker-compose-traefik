@@ -4,6 +4,7 @@ DOCKER_COMPOSE ?= docker-compose
 DOCKER_COMPOSE_UP_OPT =
 
 GEN_MK_VARS = TRAEFIK_BRIDGE NAME HOSTNAME \
+	      TRAEFIK_PORT \
 	      ACME_EMAIL
 
 FILES = docker-compose.yml traefik.yml
