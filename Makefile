@@ -61,10 +61,10 @@ start: files
 
 stop: files
 	$(DOCKER_COMPOSE) down
+	$(DOCKER) network rm $(TRAEFIK_BRIDGE)
 
 restart: files
-	-$(MAKE) stop
-	$(MAKE) start
+	$(DOCKER_COMPOSE) restart
 
 logs: files
 	$(DOCKER_COMPOSE) logs -f
