@@ -23,4 +23,5 @@ certificatesResolvers:
 providers:
   docker:
     watch: true
+    network: @@TRAEFIK_BRIDGE@@
     exposedByDefault: false
