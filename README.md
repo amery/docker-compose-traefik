@@ -7,5 +7,5 @@
 
 ## See Also
 
+- https://github.com/amery/docker-compose-whoami
 - https://github.com/amery/docker-compose-mediawiki
-- https://github.com/amery/docker-compose-traefik

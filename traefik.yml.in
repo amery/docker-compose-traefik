@@ -1,0 +1,26 @@
+# vim: ft=yaml ts=2 sw=2 et:
+entryPoints:
+  http:
+    address: :80
+  https:
+    address: :443
+    http:
+      tls:
+        certResolver: letsencrypt
+
+api:
+  insecure: true
+
+accessLog: {}
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: @@ACME_EMAIL@@
+      httpChallenge:
+        entryPoint: http
+
+providers:
+  docker:
+    watch: true
+    exposedByDefault: false

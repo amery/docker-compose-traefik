@@ -2,14 +2,21 @@
 version: '3'
 services:
 
-  whoami:
+  traefik:
     container_name: @@NAME@@
-    image: traefik/whoami
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.whoami.rule=Host(`@@HOSTNAME@@`)"
+    image: traefik:v2.3
+
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+      - "127.0.0.1:8080:8080"
     networks:
       - @@TRAEFIK_BRIDGE@@
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./traefik.yml:/etc/traefik/traefik.yml"
+      - "./acme.json:/acme.json"
 
 networks:
   @@TRAEFIK_BRIDGE@@:

@@ -3,9 +3,10 @@ DOCKER_COMPOSE ?= docker-compose
 
 DOCKER_COMPOSE_UP_OPT =
 
-GEN_MK_VARS = TRAEFIK_BRIDGE NAME HOSTNAME
+GEN_MK_VARS = TRAEFIK_BRIDGE NAME HOSTNAME \
+	      ACME_EMAIL
 
-FILES = docker-compose.yml
+FILES = docker-compose.yml traefik.yml acme.json
 SHELL = /bin/sh
 
 CONFIG_MK = config.mk
@@ -53,13 +54,15 @@ up: files
 	$(DOCKER_COMPOSE) up $(DOCKER_COMPOSE_UP_OPT)
 
 start: files
+	$(DOCKER) network list | grep -q " $(TRAEFIK_BRIDGE) " || $(DOCKER) network create $(TRAEFIK_BRIDGE)
 	$(DOCKER_COMPOSE) up -d $(DOCKER_COMPOSE_UP_OPT)
 
 stop: files
 	$(DOCKER_COMPOSE) down
 
 restart: files
-	$(DOCKER_COMPOSE) restart
+	-$(MAKE) stop
+	$(MAKE) start
 
 logs: files
 	$(DOCKER_COMPOSE) logs -f
