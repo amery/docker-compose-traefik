@@ -1,4 +1,3 @@
 docker-compose.yml
 gen.mk
 traefik.yml
-acme.json
