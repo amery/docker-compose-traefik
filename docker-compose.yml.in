@@ -2,8 +2,8 @@
 version: '3'
 services:
 
-  traefik:
-    container_name: @@NAME@@
+  @@NAME@@:
+    container_name: traefik
     image: traefik:v2.3
 
     restart: always
