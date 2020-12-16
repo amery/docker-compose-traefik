@@ -1,8 +1,8 @@
 # vim: ft=yaml ts=2 sw=2 et:
 entryPoints:
-  http:
+  web:
     address: :80
-  https:
+  websecure:
     address: :443
     http:
       tls:
