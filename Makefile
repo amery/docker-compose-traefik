@@ -85,6 +85,7 @@ endif
 
 config: files
 	$(DOCKER_COMPOSE) config | $(COLOUR_YAML)
+	$(COLOUR_YAML) traefik.yml
 
 inspect:
 	$(DOCKER_COMPOSE) ps
