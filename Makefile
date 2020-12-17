@@ -23,8 +23,10 @@ PYGMENTIZE ?= $(shell which pygmentize)
 
 ifneq ($(PYGMENTIZE),)
 COLOUR_YAML = $(PYGMENTIZE) -l yaml
+COLOUR_JSON = $(PYGMENTIZE) -l json
 else
 COLOUR_YAML = cat
+COLOUR_JSON = cat
 endif
 
 # variables
@@ -99,6 +101,7 @@ endif
 config: files
 	$(DOCKER_COMPOSE) config | $(COLOUR_YAML)
 	$(COLOUR_YAML) traefik.yml
+	$(COLOUR_JSON) acme.json
 
 inspect:
 	$(DOCKER_COMPOSE) ps
