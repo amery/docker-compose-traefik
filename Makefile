@@ -1,25 +1,37 @@
 DOCKER ?= docker
 DOCKER_COMPOSE ?= docker-compose
 
-PYGMENTIZE ?= $(shell which pygmentize)
-
 DOCKER_COMPOSE_UP_OPT =
-
-GEN_MK_VARS = TRAEFIK_BRIDGE NAME HOSTNAME \
-	      TRAEFIK_PORT \
-	      ACME_EMAIL
-
-FILES = docker-compose.yml traefik.yml
 SHELL = /bin/sh
+
+# generated outputs
+#
+FILES = docker-compose.yml traefik.yml
 
 CONFIG_MK = config.mk
 GEN_MK = gen.mk
+
+# scripts
+#
+CONFIG_MK_SH = $(CURDIR)/scripts/config_mk.sh
+GET_VARS_SH = $(CURDIR)/scripts/get_vars.sh
+GEN_MK_SH = $(CURDIR)/scripts/gen_mk.sh
+
+# colours
+#
+PYGMENTIZE ?= $(shell which pygmentize)
 
 ifneq ($(PYGMENTIZE),)
 COLOUR_YAML = $(PYGMENTIZE) -l yaml
 else
 COLOUR_YAML = cat
 endif
+
+# variables
+#
+TEMPLATES = $(addsuffix .in, $(FILES))
+DEPS = $(GET_VARS_SH) $(TEMPLATES) Makefile
+GEN_MK_VARS = $(shell $(GET_VARS_SH) $(TEMPLATES))
 
 .PHONY: all files clean files pull build
 .PHONY: up start stop restart logs
@@ -41,11 +53,11 @@ clean:
 	done
 	touch $@
 
-$(GEN_MK): $(CURDIR)/gen_mk.sh Makefile
+$(GEN_MK): $(GEN_MK_SH) $(DEPS)
 	$< $(GEN_MK_VARS) > $@~
 	mv $@~ $@
 
-$(CONFIG_MK): $(CURDIR)/config_mk.sh Makefile
+$(CONFIG_MK): $(CONFIG_MK_SH) $(DEPS)
 	$< $@ $(GEN_MK_VARS)
 	touch $@
 
