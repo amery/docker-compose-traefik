@@ -85,6 +85,7 @@ stop: files
 	$(DOCKER) network rm $(TRAEFIK_BRIDGE)
 
 restart: files
+	chmod 0600 acme.json
 	$(DOCKER_COMPOSE) restart
 
 logs: files
