@@ -13,10 +13,37 @@ services:
       - "@@TRAEFIK_PORT@@:8080"
     networks:
       - @@TRAEFIK_BRIDGE@@
+    depends_on:
+      - ca
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "./traefik.yml:/etc/traefik/traefik.yml"
       - "./acme.json:/acme.json"
+
+  ca:
+    container_name: ca
+    image: smallstep/step-ca
+
+    restart: always
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      # http redirect
+      - "traefik.http.middlewares.ca-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.ca-plain.entrypoints=web"
+      - "traefik.http.routers.ca-plain.rule=Host(`@@STEP_CA_HOSTNAME@@`)"
+      - "traefik.http.routers.ca-plain.middlewares=ca-redirect"
+      # https forward
+      - "traefik.http.routers.ca.entrypoints=websecure"
+      - "traefik.http.routers.ca.rule=Host(`@@STEP_CA_HOSTNAME@@`)"
+      - "traefik.http.routers.ca.tls=true"
+      - "traefik.http.routers.ca.service=ca"
+      - "traefik.http.services.ca.loadbalancer.server.port=@@STEP_CA_PORT@@"
+    networks:
+      - @@TRAEFIK_BRIDGE@@
+    volumes:
+      - "./step:/home/step"
 
 networks:
   @@TRAEFIK_BRIDGE@@:

@@ -4,6 +4,8 @@ DOCKER_COMPOSE ?= docker-compose
 DOCKER_COMPOSE_UP_OPT =
 SHELL = /bin/sh
 
+TMPDIR ?= $(PWD)/.tmp
+
 # generated outputs
 #
 FILES = docker-compose.yml traefik.yml
@@ -47,7 +49,7 @@ all: pull build
 #
 #
 clean:
-	rm -f $(FILES) *~
+	rm -rf $(FILES) $(TMPDIR) *~
 
 .gitignore: Makefile
 	for x in $(FILES); do \
@@ -63,7 +65,7 @@ $(CONFIG_MK): $(CONFIG_MK_SH) $(DEPS)
 	$< $@ $(GEN_MK_VARS)
 	touch $@
 
-files: $(FILES) $(CONFIG_MK) $(GEN_MK) .gitignore
+files: $(FILES) $(CONFIG_MK) $(GEN_MK) .gitignore $(TMPDIR)/ca.fingerprint
 
 pull: files
 	$(DOCKER_COMPOSE) pull
@@ -82,7 +84,8 @@ up: files
 start: files
 	chmod 0600 acme.json
 	$(DOCKER) network list | grep -q " $(TRAEFIK_BRIDGE) " || $(DOCKER) network create $(TRAEFIK_BRIDGE)
-	$(DOCKER_COMPOSE) up -d $(DOCKER_COMPOSE_UP_OPT)
+	env CA_FINGERPRINT=$(cat $(TMPDIR)/ca.fingerprint) \
+		       $(DOCKER_COMPOSE) up -d $(DOCKER_COMPOSE_UP_OPT)
 
 stop: files
 	$(DOCKER_COMPOSE) down --remove-orphans
@@ -108,3 +111,24 @@ config: files
 inspect:
 	$(DOCKER_COMPOSE) ps
 	$(DOCKER) network inspect -v $(TRAEFIK_BRIDGE) | $(COLOUR_YAML)
+
+# CA
+#
+.PHONY: ca
+ca: $(TMPDIR)/ca.fingerprint
+
+step/secrets/password:
+	mkdir -p $(@D)
+	$(PWGEN_CMD) 20 > $@~
+	mv $@~ $@
+
+step/config/ca.json: step/secrets/password
+	$(STEP_CMD) ca init $(STEP_CA_INIT_ARGS) \
+		--provisioner-password-file=secrets/password \
+		--password-file=secrets/password
+
+$(TMPDIR)/ca.fingerprint: step/config/ca.json
+	@mkdir -p $(@D)
+	$(STEP_CMD) certificate fingerprint \
+		certs/root_ca.crt > $@~
+	mv $@~ $@

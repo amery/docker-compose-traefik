@@ -1,3 +1,4 @@
 /docker-compose.yml
 /gen.mk
 /traefik.yml
+/.tmp
