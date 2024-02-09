@@ -1,5 +1,5 @@
 DOCKER ?= docker
-DOCKER_COMPOSE ?= docker-compose
+DOCKER_COMPOSE ?= $(DOCKER) compose
 
 DOCKER_COMPOSE_UP_OPT =
 SHELL = /bin/sh
@@ -107,4 +107,4 @@ config: files
 
 inspect:
 	$(DOCKER_COMPOSE) ps
-	$(DOCKER) network inspect -v $(TRAEFIK_BRIDGE) | $(COLOUR_YAML)
+	$(DOCKER) network inspect -v $(TRAEFIK_BRIDGE) | $(COLOUR_JSON)
