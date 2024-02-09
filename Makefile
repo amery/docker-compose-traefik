@@ -92,8 +92,7 @@ stop: files
 	$(DOCKER_COMPOSE) down --remove-orphans
 	$(DOCKER) network rm $(TRAEFIK_BRIDGE)
 
-restart: files
-	chmod 0600 acme.json
+restart: prestart
 	$(DOCKER_COMPOSE) restart
 
 logs: files
