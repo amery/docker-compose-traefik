@@ -77,12 +77,15 @@ include $(CONFIG_MK)
 
 export COMPOSE_PROJECT_NAME=$(NAME)
 
-up: files
-	$(DOCKER_COMPOSE) up $(DOCKER_COMPOSE_UP_OPT)
-
-start: files
+.PHONY: prestart
+prestart: files
 	chmod 0600 acme.json
 	$(DOCKER) network list | grep -q " $(TRAEFIK_BRIDGE) " || $(DOCKER) network create $(TRAEFIK_BRIDGE)
+
+up: prestart
+	$(DOCKER_COMPOSE) up $(DOCKER_COMPOSE_UP_OPT)
+
+start: prestart
 	$(DOCKER_COMPOSE) up -d $(DOCKER_COMPOSE_UP_OPT)
 
 stop: files
